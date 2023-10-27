@@ -1,9 +1,8 @@
 plugins {
-  id "org.sonarqube" version "2.7"
+    id 'org.sonarqube' version '2.7'
 }
 
 apply plugin: 'java'
-apply plugin: 'maven'
 apply plugin: 'jacoco'
 
 group = 'com.gourav'
@@ -14,34 +13,32 @@ description = """restApi"""
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8'
 }
 task stage(dependsOn: ['build', 'clean'])
 build.mustRunAfter clean
 
 task copyToLib(type: Copy) {
     into "$buildDir/libs"
-    from(configurations.compile)
+    from(configurations.compileClasspath)
 }
 
 stage.dependsOn(copyToLib)
 
 repositories {
-     maven { url "https://repo.maven.apache.org/maven2" }
-}
-dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version:'2.1.1.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'2.1.1.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.1.1.RELEASE'
-    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version:'2.1.1.RELEASE'
+    mavenCentral() // Use 'mavenCentral()' to define the repository
 }
 
-gradle.taskGraph.whenReady {
-  taskGraph ->
-    if (taskGraph.hasTask(stage)) {
-      test.enabled = false
-    }
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb:2.1.1.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.1.1.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.1.1.RELEASE'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.1.1.RELEASE'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
 jar {
